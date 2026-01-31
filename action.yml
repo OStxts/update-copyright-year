@@ -57,9 +57,9 @@ runs:
         # This keeps single-year headers clean when the current year equals the start year.
         cleanup_regex='s/^(.*Copyright[^0-9]*)([0-9]{4})-\2([[:space:]]+.*)?$/\1\2\3/'
 
-        read -r -a DIRS <<< "${targets}"
-        read -r -a EXCLUDES <<< "${exclude_paths}"
-        read -r -a INCLUDES <<< "${include_glob}"
+        IFS=$' \n\t' read -r -a DIRS <<< "${targets}"
+        IFS=$' \n\t' read -r -a EXCLUDES <<< "${exclude_paths}"
+        IFS=$' \n\t' read -r -a INCLUDES <<< "${include_glob}"
 
         mapfile -t REGEXPS <<< "${headers_regexp}"
         sed_args=()
