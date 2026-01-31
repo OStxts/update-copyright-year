@@ -38,7 +38,6 @@ jobs:
 
       - name: Update year in headers
         uses: octivi/update-copyright-year@v1
-        with:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
