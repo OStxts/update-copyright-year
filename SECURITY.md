@@ -11,9 +11,13 @@
 
 Please do not open public issues for security vulnerabilities.
 
-Preferred: use GitHub Security Advisories for this repository (private disclosure).
+Preferred: use [GitHub Security Advisories](https://github.com/octivi/update-copyright-year/security/advisories)
+for this repository (private disclosure).
 
-If Security Advisories are not available, open a new issue and clearly mark it as "security" in the title, or contact the maintainers via the repository owners profile.
+If [GitHub Security Advisories](https://github.com/octivi/bash-boilerplate/security/advisories)
+are not available, [open a new issue](https://github.com/octivi/bash-boilerplate/security/advisories)
+and clearly mark it as **security** in the title, or contact
+[the maintainers](https://github.com/orgs/octivi/people).
 
 ## Response Targets
 
@@ -22,4 +26,5 @@ If Security Advisories are not available, open a new issue and clearly mark it a
 
 ## Security Updates
 
-Security fixes are released on the supported major version (currently v1.x). Users should upgrade to the latest v1.x release.
+Security fixes are released on the supported major version (currently v1.x). Users should upgrade
+to the latest v1.x release.
