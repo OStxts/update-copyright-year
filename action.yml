@@ -74,7 +74,7 @@ runs:
         sed_args=()
         for re in "${REGEXPS[@]}"; do
           [[ -n "${re}" ]] || continue
-          re="${re//\{\{CURRENT_YEAR\}\}/${current_year}}"
+          re="${re//{{CURRENT_YEAR}}/${current_year}}"
           sed_args+=(-e "${re}")
         done
 
