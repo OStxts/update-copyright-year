@@ -194,6 +194,33 @@ TXT
   assert_contains "${tmp}/e.txt" "Copyright 2021-2030 ACME Inc."
 }
 
+test_raw_regexps_without_escaping() {
+  local tmp
+  tmp="$(make_tmp)"
+
+  cat <<'TXT' > "${tmp}/raw-org.txt"
+Copyright 2021-2026 ACME Inc.
+TXT
+
+  CURRENT_YEAR=2030 "${UPDATE_COPYRIGHT_YEAR}" \
+    --targets "${tmp}" \
+    --include-glob "**/*.txt" \
+    --organization-regexp 'ACME Inc\.'
+
+  assert_contains "${tmp}/raw-org.txt" "Copyright 2021-2030 ACME Inc."
+
+  cat <<'TXT' > "${tmp}/raw-header.txt"
+SPDX-FileCopyrightText: 2019-2026 ACME Inc.
+TXT
+
+  CURRENT_YEAR=2030 "${UPDATE_COPYRIGHT_YEAR}" \
+    --targets "${tmp}" \
+    --include-glob "**/*.txt" \
+    --headers-regexp 's/^(SPDX-FileCopyrightText: [0-9]{4})(-[0-9]{4})?(.*)$/\1-{{CURRENT_YEAR}}\3/'
+
+  assert_contains "${tmp}/raw-header.txt" "SPDX-FileCopyrightText: 2019-2030 ACME Inc."
+}
+
 test_headers_regexp_override() {
   local tmp
   tmp="$(make_tmp)"
@@ -364,6 +391,7 @@ main() {
   run_test "cleanup single-year range" test_cleanup_range
   run_test "organization regexp" test_organization_regexp
   run_test "organization regexp double backslash" test_organization_regexp_double_backslash
+  run_test "raw regexps without escaping" test_raw_regexps_without_escaping
   run_test "headers regexp override" test_headers_regexp_override
   run_test "headers regexp multiline" test_headers_regexp_multiline
   run_test "headers regexp whitespace uses default" test_headers_regexp_whitespace_uses_default
