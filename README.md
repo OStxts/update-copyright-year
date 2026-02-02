@@ -1,6 +1,8 @@
 # Update Copyright Year GitHub Action
 
 [![license](https://img.shields.io/github/license/octivi/bash-boilerplate)](https://choosealicense.com/licenses/mit/)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org/)
+[![semver](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
 
 GitHub Action that updates the copyright year in file headers across your repository.
 
@@ -28,6 +30,21 @@ Keeps year ranges in headers accurate with minimal maintenance, especially for r
 | `organization_regexp` | No | *(empty)* | Optional regexp snippet for the organization/person name after the year (used only when `headers_regexp` is empty) |
 | `headers_regexp` | No | *(see below)* | Array of `sed` regexps (one per line). Use `{{CURRENT_YEAR}}` as a placeholder |
 
+## CLI usage
+
+Run locally from this repo:
+
+```bash
+./update-copyright-year \
+  --targets ". src scripts" \
+  --exclude-paths ".github/workflows build" \
+  --include-glob "**/*.{sh,py,js}" \
+  --organization-regexp "IMAGIN sp\. z o\.o\."
+```
+
+Options map 1:1 to the action inputs. You can also set them via env vars:
+`TARGETS`, `EXCLUDE_PATHS`, `INCLUDE_GLOB`, `ORGANIZATION_REGEXP`, `HEADERS_REGEXP`, `CURRENT_YEAR`.
+
 Default `headers_regexp`:
 
 ```text
@@ -49,9 +66,9 @@ If you want a literal organization name, escape regexp metacharacters (for examp
 Update regex (default) matches both single years and ranges:
 
 ```text
-Copyright 2021
-Copyright (c) 2021-2024
-Copyright 2021 ACME Inc.
+Copyright 2021-2026
+Copyright (c) 2021-2026
+Copyright 2021-2026 ACME Inc.
 ```
 
 Assuming the current year is 2026, the updates become:
@@ -65,7 +82,7 @@ Copyright 2021-2026 ACME Inc.
 Cleanup regex (always applied) then collapses:
 
 ```text
-Copyright 2026-2026
+Copyright 2026
 ```
 
 to:
@@ -85,6 +102,16 @@ s/^(.*Copyright[^0-9]*)([0-9]{4})(-[0-9]{4})?([[:space:]]+.*)?$/\1\2-{{CURRENT_Y
 # Match "Copyright 2019, Company" (commas or extra text at end)
 s/^(.*Copyright[^0-9]*)([0-9]{4})([[:space:]]*,.*)?$/\1\2-{{CURRENT_YEAR}}\3/
 ```
+
+## Tests
+
+Run the lightweight test suite (no external deps):
+
+```bash
+./tests/run
+```
+
+Set `CURRENT_YEAR` to make tests deterministic.
 
 ## Limitations
 
