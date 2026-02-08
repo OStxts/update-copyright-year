@@ -49,7 +49,7 @@ fail() {
 assert_contains() {
   local file="$1"
   local expected="$2"
-  if ! grep -q -- "${expected}" "${file}"; then
+  if ! grep -Fq -- "${expected}" "${file}"; then
     echo "Expected to find: ${expected}" 1>&2
     echo "In file: ${file}" 1>&2
     echo "---" 1>&2
@@ -62,7 +62,7 @@ assert_contains() {
 assert_not_contains() {
   local file="$1"
   local expected="$2"
-  if grep -q -- "${expected}" "${file}"; then
+  if grep -Fq -- "${expected}" "${file}"; then
     echo "Expected NOT to find: ${expected}" 1>&2
     echo "In file: ${file}" 1>&2
     echo "---" 1>&2
