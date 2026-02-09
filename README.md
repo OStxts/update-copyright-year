@@ -18,16 +18,16 @@ Keeps year ranges in headers accurate with minimal maintenance, especially for r
 
 ## Why choose this action
 
-- Pure Bash implementation with minimal dependencies.
-- Fast startup: no `npm`/`pip` install step during workflow execution.
-- Lower supply-chain and maintenance overhead: no runtime pinning, lockfiles, or dependency CVEs.
-- Easier security audit: all logic lives in a small, readable script.
-- Covered by automated tests (`./tests/run`) and CI.
+- Pure Bash implementation with minimal dependencies
+- Fast startup: no `npm`/`pip` install step during workflow execution
+- Lower supply-chain and maintenance overhead: no runtime pinning, lockfiles, or dependency CVEs
+- Easier security audit: all logic lives in a small, readable script
+- Covered by automated tests (`./tests/run`) and CI
 - Works on `ubuntu-slim`, which can help reduce runner costs:
-  https://docs.github.com/en/actions/reference/runners/github-hosted-runners
-- Can be used both as a GitHub Action and as a standalone script.
-- Released under the MIT License: a short and simple permissive license.
-- Documented security policy: [SECURITY.md](./SECURITY.md).
+  <https://docs.github.com/en/actions/reference/runners/github-hosted-runners>
+- Can be used both as a GitHub Action and as a standalone script
+- Released under the MIT License: a short and simple permissive license
+- Documented security policy: [SECURITY.md](./SECURITY.md)
 
 ## Getting started
 
@@ -40,7 +40,7 @@ Keeps year ranges in headers accurate with minimal maintenance, especially for r
 | Name | Required | Default | Description |
 | --- | --- | --- | --- |
 | `targets` | No | `.` | Directories to scan (space-, comma- or newline-separated), e.g. `. src scripts` |
-| `exclude_paths` | No | `.github/workflows` | Paths to exclude (space-, comma- or newline-separated), e.g. `.github/workflows build`. Relative paths are resolved against each target; absolute paths are supported. |
+| `exclude_paths` | No | `.github/workflows` | Paths to exclude (space-, comma- or newline-separated), e.g. `.github/workflows build`. Relative paths are resolved against each target; absolute paths are supported |
 | `include_glob` | No | *(empty)* | Optional glob patterns to include (space-, comma- or newline-separated), e.g. `**/*.{sh,py,js}` |
 | `organization_regexp` | No | *(empty)* | Optional regexp snippet for the organization/person name after the year (used only when `headers_regexp` is empty) |
 | `headers_regexp` | No | *(see below)* | Array of `sed` regexps (one per line). Use `{{CURRENT_YEAR}}` as a placeholder |
@@ -142,10 +142,10 @@ Set `CURRENT_YEAR` to make tests deterministic.
 
 ## Limitations
 
-- Only files detected as `text/*` by the `file` command are edited.
-- Uses GNU `sed` options available on `ubuntu-latest` and `ubuntu-slim` runners.
-- Include patterns are Bash globs matched against the file path (with or without a leading `./`).
-- Exclude paths are resolved per target directory; absolute paths are matched as-is.
+- Only files detected as `text/*` by the `file` command are edited
+- Uses GNU `sed` options available on `ubuntu-latest` and `ubuntu-slim` runners
+- Include patterns are Bash globs matched against the file path (with or without a leading `./`)
+- Exclude paths are resolved per target directory; absolute paths are matched as-is
 
 ## Example workflow
 
