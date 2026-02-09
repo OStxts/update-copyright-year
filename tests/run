@@ -337,6 +337,48 @@ TXT
   assert_not_contains "${tmp}/.github/workflows/l.txt" "2021-2030"
 }
 
+test_dry_run_does_not_modify_files() {
+  local tmp
+  tmp="$(make_tmp)"
+
+  cat <<'TXT' > "${tmp}/a.txt"
+Copyright 2021 ACME Inc.
+TXT
+
+  run_and_capture env \
+    CURRENT_YEAR=2030 \
+    DRY_RUN=true \
+    "${UPDATE_COPYRIGHT_YEAR}" \
+    --targets "${tmp}" \
+    --include-glob "**/*.txt"
+
+  assert_equal "${CAPTURED_STATUS}" "0"
+  assert_str_contains "${CAPTURED_OUTPUT}" "Mode: dry-run=true, verbose=false"
+  assert_str_contains "${CAPTURED_OUTPUT}" "[DRY-RUN] Would update"
+  assert_contains "${tmp}/a.txt" "Copyright 2021 ACME Inc."
+  assert_not_contains "${tmp}/a.txt" "2021-2030"
+}
+
+test_verbose_mode_logs_no_change() {
+  local tmp
+  tmp="$(make_tmp)"
+
+  cat <<'TXT' > "${tmp}/a.txt"
+Copyright 2021-2030 ACME Inc.
+TXT
+
+  run_and_capture env \
+    CURRENT_YEAR=2030 \
+    VERBOSE=true \
+    "${UPDATE_COPYRIGHT_YEAR}" \
+    --targets "${tmp}" \
+    --include-glob "**/*.txt"
+
+  assert_equal "${CAPTURED_STATUS}" "0"
+  assert_str_contains "${CAPTURED_OUTPUT}" "Mode: dry-run=false, verbose=true"
+  assert_str_contains "${CAPTURED_OUTPUT}" "No change:"
+}
+
 test_multiline_targets_excludes_and_include_glob() {
   local tmp
   local targets
@@ -369,6 +411,26 @@ TXT
   assert_contains "${tmp}/docs/b.py" "Copyright 2021-2030 ACME Inc."
   assert_contains "${tmp}/skip/c.txt" "Copyright 2021-2026 ACME Inc."
   assert_not_contains "${tmp}/skip/c.txt" "2021-2030"
+}
+
+test_non_empty_verbose_env_enables_mode() {
+  local tmp
+  tmp="$(make_tmp)"
+
+  cat <<'TXT' > "${tmp}/a.txt"
+Copyright 2021-2030 ACME Inc.
+TXT
+
+  run_and_capture env \
+    CURRENT_YEAR=2030 \
+    VERBOSE=maybe \
+    "${UPDATE_COPYRIGHT_YEAR}" \
+    --targets "${tmp}" \
+    --include-glob "**/*.txt"
+
+  assert_equal "${CAPTURED_STATUS}" "0"
+  assert_str_contains "${CAPTURED_OUTPUT}" "Mode: dry-run=false, verbose=true"
+  assert_str_contains "${CAPTURED_OUTPUT}" "No change:"
 }
 
 test_binary_files_skipped() {
@@ -432,7 +494,10 @@ main() {
   run_test "headers regexp double backslash" test_headers_regexp_double_backslash
   run_test "exclude paths" test_exclude_paths
   run_test "absolute targets with absolute exclude" test_absolute_targets_with_absolute_exclude
+  run_test "dry-run does not modify files" test_dry_run_does_not_modify_files
+  run_test "verbose mode logs no change" test_verbose_mode_logs_no_change
   run_test "multiline targets excludes and include_glob" test_multiline_targets_excludes_and_include_glob
+  run_test "non-empty verbose env enables mode" test_non_empty_verbose_env_enables_mode
   run_test "binary files skipped" test_binary_files_skipped
   run_test "no targets whitespace" test_no_targets_whitespace
   run_test "no valid target dirs" test_no_valid_target_dirs

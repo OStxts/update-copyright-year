@@ -29,9 +29,17 @@ readonly __my_args
 IFS=$'\n\t'
 ################################################################################
 
+is_github_actions=false
+if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+  is_github_actions=true
+fi
+
+DRY_RUN="${DRY_RUN-}"
+VERBOSE="${VERBOSE-}"
+
 usage() {
   cat <<USAGE
-Usage: ${__my_name} [--targets targets] [--exclude-paths exclude_paths] [--include-glob include_glob] [--organization-regexp organization_regexp] [--headers-regexp headers_regexp] [--help|-h]
+Usage: ${__my_name} [--targets targets] [--exclude-paths exclude_paths] [--include-glob include_glob] [--organization-regexp organization_regexp] [--headers-regexp headers_regexp] [--dry-run] [--verbose] [--help|-h]
 
 Options:
   --targets targets                       Directories to scan (default: .)
@@ -40,6 +48,8 @@ Options:
   --organization-regexp organization_regexp
                                           Optional org/person regexp (used when --headers-regexp is empty)
   --headers-regexp headers_regexp         Sed regexps (one per line), use {{CURRENT_YEAR}}
+  --dry-run                               Show what would change without modifying files
+  --verbose                               Print detailed progress logs
   -h, --help                              Show this help message
 
 For list options, pass a single option-argument and separate items with spaces, commas,
@@ -47,11 +57,60 @@ or newlines, for example:
   --targets ". src scripts"
   --exclude-paths ".github/workflows build"
   --include-glob "**/*.{sh,py,js}"
+
+Environment:
+  DRY_RUN=<any non-empty value>           Enable dry-run mode
+  VERBOSE=<any non-empty value>           Enable verbose logs
 USAGE
 }
 
+emit_group_start() {
+  local title="$1"
+  if [[ "${is_github_actions}" == true ]]; then
+    echo "::group::${title}"
+  elif [[ -n "${VERBOSE:-}" ]]; then
+    echo "== ${title} =="
+  fi
+}
+
+emit_group_end() {
+  if [[ "${is_github_actions}" == true ]]; then
+    echo "::endgroup::"
+  fi
+}
+
+emit_warning() {
+  local message="$1"
+  if [[ "${is_github_actions}" == true ]]; then
+    echo "::warning::${message}" >&2
+  else
+    echo "WARNING: ${message}" >&2
+  fi
+}
+
+append_step_summary() {
+  local line="$1"
+  if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+    printf '%s\n' "${line}" >> "${GITHUB_STEP_SUMMARY}" || true
+  fi
+}
+
+log_info() {
+  echo "$*"
+}
+
+log_verbose() {
+  if [[ -n "${VERBOSE:-}" ]]; then
+    echo "$*"
+  fi
+}
+
 die() {
-  echo "ERROR: $*" 1>&2
+  if [[ "${is_github_actions}" == true ]]; then
+    echo "::error::$*" >&2
+  else
+    echo "ERROR: $*" >&2
+  fi
   exit 1
 }
 
@@ -114,6 +173,12 @@ while (($#)); do
       [[ $# -gt 0 ]] || die "Missing value for --headers-regexp"
       HEADERS_REGEXP="$1"
       ;;
+    --dry-run)
+      DRY_RUN=1
+      ;;
+    --verbose)
+      VERBOSE=1
+      ;;
     --)
       shift
       break
@@ -145,8 +210,22 @@ else
   current_year="$(date +%Y)"
 fi
 
+dry_run_enabled=false
+verbose_enabled=false
+if [[ -n "${DRY_RUN:-}" ]]; then
+  dry_run_enabled=true
+fi
+if [[ -n "${VERBOSE:-}" ]]; then
+  verbose_enabled=true
+fi
+
+log_info "Mode: dry-run=${dry_run_enabled}, verbose=${verbose_enabled}"
+
 if [[ -z "${TARGETS//[[:space:]]/}" ]]; then
-  echo "No targets provided; nothing to do."
+  emit_warning "No targets provided; nothing to do."
+  append_step_summary "### ${__my_name}"
+  append_step_summary "- Mode: dry-run=${dry_run_enabled}, verbose=${verbose_enabled}"
+  append_step_summary "- Result: no targets provided"
   exit 0
 fi
 
@@ -191,6 +270,9 @@ fi
 
 shopt -s globstar
 valid_dirs=0
+candidate_files=0
+updated_files=0
+emit_group_start "Processing targets"
 for dir in "${DIRS[@]}"; do
   [[ -d "${dir}" ]] || continue
   valid_dirs=$((valid_dirs + 1))
@@ -206,7 +288,7 @@ for dir in "${DIRS[@]}"; do
     fi
   done
 
-  find "${dir}" "${prune_args[@]}" -type f -print0 | while IFS= read -r -d '' file; do
+  while IFS= read -r -d '' file; do
     if [[ "${#INCLUDES[@]}" -gt 0 ]]; then
       matched=false
       for pat in "${INCLUDES[@]}"; do
@@ -221,17 +303,47 @@ for dir in "${DIRS[@]}"; do
     fi
 
     if [[ "$(file --mime-type --brief "${file}")" == text/* ]]; then
+      candidate_files=$((candidate_files + 1))
+      tmp_file="$(mktemp)"
       sed \
         --regexp-extended \
-        --in-place \
         "${sed_args[@]}" \
         -e "${cleanup_regex}" \
-        "${file}"
+        "${file}" > "${tmp_file}"
+
+      if ! cmp -s "${file}" "${tmp_file}"; then
+        updated_files=$((updated_files + 1))
+        if [[ "${dry_run_enabled}" == true ]]; then
+          log_info "[DRY-RUN] Would update ${file}"
+        else
+          cat "${tmp_file}" > "${file}"
+          log_verbose "Updated ${file}"
+        fi
+      else
+        log_verbose "No change: ${file}"
+      fi
+      rm -f "${tmp_file}"
     fi
-  done
+  done < <(find "${dir}" "${prune_args[@]}" -type f -print0)
 done
+emit_group_end
 
 if [[ "${valid_dirs}" -eq 0 ]]; then
-  echo "No valid target directories found; nothing to do."
+  emit_warning "No valid target directories found; nothing to do."
+  append_step_summary "### ${__my_name}"
+  append_step_summary "- Mode: dry-run=${dry_run_enabled}, verbose=${verbose_enabled}"
+  append_step_summary "- Result: no valid target directories"
   exit 0
+fi
+
+append_step_summary "### ${__my_name}"
+append_step_summary "- Mode: dry-run=${dry_run_enabled}, verbose=${verbose_enabled}"
+append_step_summary "- Candidate files: ${candidate_files}"
+append_step_summary "- Files to update: ${updated_files}"
+append_step_summary "- Current year used: ${current_year}"
+
+if [[ "${dry_run_enabled}" == true ]]; then
+  log_info "Dry-run completed. Files to update: ${updated_files}"
+else
+  log_info "Completed. Updated files: ${updated_files}"
 fi

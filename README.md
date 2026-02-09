@@ -44,6 +44,8 @@ Keeps year ranges in headers accurate with minimal maintenance, especially for r
 | `include_glob` | No | *(empty)* | Optional glob patterns to include (space-, comma- or newline-separated), e.g. `**/*.{sh,py,js}` |
 | `organization_regexp` | No | *(empty)* | Optional regexp snippet for the organization/person name after the year (used only when `headers_regexp` is empty) |
 | `headers_regexp` | No | *(see below)* | Array of `sed` regexps (one per line). Use `{{CURRENT_YEAR}}` as a placeholder |
+| `dry_run` | No | `false` | If `true`, print planned changes without modifying files |
+| `verbose` | No | `false` | If `true`, print detailed logs |
 
 ## CLI usage
 
@@ -58,8 +60,17 @@ Run locally from this repo:
 ```
 
 Options map 1:1 to the action inputs. You can also set them via env vars:
-`TARGETS`, `EXCLUDE_PATHS`, `INCLUDE_GLOB`, `ORGANIZATION_REGEXP`, `HEADERS_REGEXP`, `CURRENT_YEAR`.
+`TARGETS`, `EXCLUDE_PATHS`, `INCLUDE_GLOB`, `ORGANIZATION_REGEXP`, `HEADERS_REGEXP`, `CURRENT_YEAR`, `DRY_RUN`, `VERBOSE`.
 For list inputs (`TARGETS`, `EXCLUDE_PATHS`, `INCLUDE_GLOB`) you can separate values with spaces, commas, newlines, or mix these separators.
+`DRY_RUN` and `VERBOSE` are presence flags: any non-empty value enables the mode, leaving the variable unset disables it.
+
+Optional execution modes:
+
+```bash
+./update-copyright-year --dry-run --verbose
+```
+
+When run inside GitHub Actions, logs are grouped, warnings/errors are emitted as workflow annotations, and a short result is written to `GITHUB_STEP_SUMMARY`.
 
 Default `headers_regexp`:
 

@@ -32,6 +32,14 @@ inputs:
     description: "Array of sed regexps (one per line). Use {{CURRENT_YEAR}} as a placeholder. Leave empty to use the built-in default (optionally constrained by organization_regexp)."
     required: false
     default: ""
+  dry_run:
+    description: "If true, print planned changes without modifying files"
+    required: false
+    default: "false"
+  verbose:
+    description: "If true, print detailed logs"
+    required: false
+    default: "false"
 runs:
   using: composite
   steps:
@@ -43,4 +51,6 @@ runs:
         INCLUDE_GLOB: ${{ inputs.include_glob }}
         ORGANIZATION_REGEXP: ${{ inputs.organization_regexp }}
         HEADERS_REGEXP: ${{ inputs.headers_regexp }}
+        DRY_RUN: ${{ inputs.dry_run == 'true' && '1' || '' }}
+        VERBOSE: ${{ inputs.verbose == 'true' && '1' || '' }}
       run: ${{ github.action_path }}/update-copyright-year
